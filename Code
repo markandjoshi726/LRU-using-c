@@ -1,0 +1,261 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define cacheSize 5
+
+int len;
+
+// ---------------------------------------------------------- DOUBLY LINKED LIST
+
+struct listNode
+{
+    char name[20];
+    struct listNode* prev;
+    struct listNode* next;
+};
+
+struct listNode* head;
+struct listNode* tail;
+
+// Function to insert a new node at the head of the linked list
+void insertList(char name[])
+{
+    struct listNode* temp = (struct listNode*)malloc(sizeof(struct listNode));
+    strcpy(temp->name, name);
+    temp->prev = NULL;
+    temp->next = NULL;
+
+    if (head == NULL)
+    {
+        head = temp;
+        tail = temp;
+    }
+    else
+    {
+        temp->next = head;
+        head->prev = temp;
+        head = temp;
+    }
+}
+
+// Function to delete the last node from the linked list
+void deleteLastList()
+{
+    struct listNode* del_el = tail;
+    tail = tail->prev;
+    tail->next = NULL;
+    free(del_el);
+}
+
+// Function to print the elements of the linked list
+void print(struct listNode* p)
+{
+    int i = 1;
+    printf("-------------------------\n");
+    while (p != NULL)
+    {
+        printf("\t%s\t\n", p->name);
+        printf("-------------------------\n");
+        p = p->next;
+        i = i + 1;
+    }
+}
+
+// ------------------------------------------------------------------------- BINARY SEARCH TREE
+
+struct treeNode
+{
+    char name[20];
+    struct listNode* address;
+    struct treeNode* lchild;
+    struct treeNode* rchild;
+};
+
+struct treeNode* root;
+
+// Function to insert a node in the Binary Search Tree (BST)
+struct treeNode* insertBST(struct treeNode* t, char name[], struct listNode* address)
+{
+    if (t == NULL)
+    {
+        struct treeNode* temp = (struct treeNode*)malloc(sizeof(struct treeNode));
+        strcpy(temp->name, name);
+        temp->address = address;
+        temp->lchild = NULL;
+        temp->rchild = NULL;
+        t = temp;
+    }
+    if (strcmp(name, t->name) < 0)
+    {
+        t->lchild = insertBST(t->lchild, name, address);
+    }
+    else if (strcmp(name, t->name) > 0)
+    {
+        t->rchild = insertBST(t->rchild, name, address);
+    }
+    return t;
+}
+
+// Function to calculate the height of the Binary Search Tree (BST)
+int heightBST(struct treeNode* t)
+{
+    if (t == NULL)
+        return 0;
+    int x, y;
+    x = heightBST(t->lchild);
+    y = heightBST(t->rchild);
+    if (x > y)
+        return x + 1;
+    else
+        return y + 1;
+}
+
+// Function to find the predecessor node in the BST
+struct treeNode* pred(struct treeNode* t)
+{
+    while (t != NULL && t->rchild != NULL)
+        t = t->rchild;
+    return t;
+}
+
+// Function to find the successor node in the BST
+struct treeNode* succ(struct treeNode* t)
+{
+    while (t != NULL && t->lchild != NULL)
+        t = t->lchild;
+    return t;
+}
+
+// Function to delete a node from the BST
+struct treeNode* deleteBST(struct treeNode* t, char name[])
+{
+    if (t == NULL)
+        return t;
+
+    if (strcmp(name, t->name) > 0)
+        t->rchild = deleteBST(t->rchild, name);
+
+    else if (strcmp(name, t->name) < 0)
+        t->lchild = deleteBST(t->lchild, name);
+
+    else
+    {
+        if (t->lchild == NULL && t->rchild == NULL)
+        {
+            free(t);
+            t = NULL;
+        }
+        else if (t->lchild != NULL && t->rchild != NULL)
+        {
+            if (heightBST(t->lchild) > heightBST(t->rchild))
+            {
+                struct treeNode* temp = pred(t->lchild);
+                strcpy(t->name, temp->name);
+                t->address = temp->address;
+                t->lchild = deleteBST(t->lchild, temp->name);
+            }
+
+            else
+            {
+                struct treeNode* temp = succ(t->rchild);
+                strcpy(t->name, temp->name);
+                t->address = temp->address;
+                t->rchild = deleteBST(t->rchild, temp->name);
+            }
+        }
+        else
+        {
+            if (t->lchild == NULL)
+            {
+                struct treeNode* temp = t;
+                t = t->rchild;
+                free(temp);
+            }
+            else
+            {
+                struct treeNode* temp = t;
+                t = t->lchild;
+                free(temp);
+            }
+        }
+    }
+    return t;
+}
+
+// Function to search for a node in the BST based on the application name
+struct treeNode* searchBST(struct treeNode* t, char name[])
+{
+    if (t == NULL)
+        return NULL;
+
+    if (strcmp(t->name, name) == 0)
+        return t;
+
+    else if (strcmp(t->name, name) > 0)
+        return searchBST(t->lchild, name);
+
+    else
+        return searchBST(t->rchild, name);
+}
+
+//-------------------------------------------------------------------
+
+// Record structure to store application usage statistics
+struct Record
+{
+    char name[20];
+    int hits;
+    int misses;
+    struct Record* lchild;
+    struct Record* rchild;
+};
+
+struct Record* start = NULL;
+
+// Function to insert a record in the Binary Search Tree for Recording Application Usage
+void insertRecord(char name[])
+{
+    struct Record* t = start;
+    struct Record* r = NULL;
+
+    struct Record* temp = (struct Record*)malloc(sizeof(struct Record));
+    strcpy(temp->name, name);
+    temp->hits = 0;
+    temp->misses = 1;
+    temp->lchild = NULL;
+    temp->rchild = NULL;
+
+    if (start == NULL)
+    {
+        start = temp;
+        return;
+    }
+
+    while (t != NULL)
+    {
+        r = t;
+
+        if (strcmp(name, t->name) < 0)
+            t = t->lchild;
+
+        else if (strcmp(name, t->name) > 0)
+            t = t->rchild;
+    }
+
+    if (strcmp(name, r->name) < 0)
+        r->lchild = temp;
+    else
+        r->rchild = temp;
+}
+
+// Function to search for a record in the recording BST based on the application name
+struct Record* searchRecord(struct Record* t, char name[])
+{
+    if (t == NULL)
+        return NULL;;
+
+    if (strcmp(t->name, name) == 0)
+        return t;
+
+    else if (strcmp(t->name, name) > 0
