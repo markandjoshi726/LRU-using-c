@@ -1,17 +1,78 @@
-# LRU-using-c
-Here, I've created an LRU cache policy utilising the C programming language and data structure ideas. I created this using a binary search tree and a doubly linked list. LRU cache policy: LRU (Least Recently Used) cache policy is a popular caching strategy used in computer systems to manage the contents of a cache. The basic idea behind LRU is to keep track of the order in which items are accessed in the cache and evict the least recently used item when the cache reaches its maximum capacity.
+# LRU Cache in C
 
-Here's how LRU cache policy typically works: Tracking Access: When an item is accessed (read or written) in the cache, it is considered the most recently used item. The LRU policy maintains a record of the access order of items. Cache Maintenance: As the cache becomes full and a new item needs to be added, the LRU policy identifies and removes the least recently used item. This eviction ensures that the cache remains within its capacity limit. Updating Access Order: When an item already present in the cache is accessed again, it becomes the most recently used item. The LRU policy updates the access order, pushing the recently accessed item to the front of the order. Data Structures: Implementing LRU often involves the use of data structures such as a doubly linked list and a hash map. The linked list keeps track of the order of items, with the most recently used item at the front and the least recently used item at the end. The hash map allows quick lookup to determine whether an item is present in the cache and, if so, its corresponding node in the linked list. Complexity: While LRU is effective in preventing the cache from becoming stale with outdated or less frequently used data, implementing it efficiently may involve more complex data structures and operations.
+An implementation of the **Least Recently Used (LRU)** cache replacement policy in C, built from scratch using a doubly linked list and binary search trees. The program simulates cache requests for application names, tracks hits and misses, and evicts the least recently used entry when the cache is full.
 
-LRU caching is commonly used in various applications, including databases, web servers, and file systems, where it helps improve performance by keeping frequently accessed data readily available in a limited-size cache. The given code implements a simple Least Recently Used (LRU) cache policy using a combination of a Doubly Linked List, Binary Search Tree (BST), and a Binary Search Tree for Recording Application Usage.
+## What is LRU?
 
-Data Structures Used: Doubly Linked List: Purpose: Used for implementing the cache, with the most recently accessed element at the head and the least recently accessed at the tail. Operations: insertList: Inserts a new element at the head of the linked list. deleteLastList: Deletes the last (least recently used) element from the linked list. print: Prints the elements of the linked list. Binary Search Tree (BST): Purpose: Used for maintaining the cache with a specific application name and its corresponding address in the linked list. Operations: insertBST: Inserts a new node in the BST with the application name and its address in the linked list. deleteBST: Deletes a node from the BST based on the application name. searchBST: Searches for a node in the BST based on the application name. heightBST: Calculates the height of the BST. pred: Finds the predecessor node in the BST. succ: Finds the successor node in the BST. Binary Search Tree for Recording Application Usage: Purpose: Used for recording the usage statistics of each application, including hits and misses. Operations: insertRecord: Inserts a new node with application name and initializes hits and misses. searchRecord: Searches for a node in the recording BST based on the application name. Record_print: Prints the summary of application usage, including cache hits and misses.
+LRU (Least Recently Used) is a caching strategy that evicts the least recently accessed item when the cache reaches capacity. Every access marks an item as most recently used, keeping frequently used data readily available. It's widely used in databases, web servers, and file systems to improve performance.
 
-Main Function: The main function simulates the LRU cache policy by taking user input and performing cache operations accordingly. Users can: Access an application (simulating a cache request). Display the current cache blocks. View the summary of application usage (hits and misses). Exit the program.
+## How It Works
 
-LRU Cache Policy Implementation Logic:
+1. When an application is accessed, the program checks whether it's already in the cache (via the BST lookup).
+2. If it's **not** in the cache, it's added to both the linked list and the BST — a **cache miss**.
+3. If it **is** in the cache, it's moved to the head of the linked list — a **cache hit**.
+4. When the cache exceeds its maximum size, the least recently used entry (the tail of the linked list) is removed from both the linked list and the BST.
 
-      1. Whenever a new application is accessed, the code checks if it is already in the cache using the BST.
-      2. If the application is not in the cache, it is added to both the linked list and the BST, simulating a cache miss.
-      3. If the application is already in the cache, it is moved to the head of the linked list, simulating a cache hit.
-      4. The cache has a maximum size (cacheSize), and if it exceeds this size, the least recently used block is removed from both the linked list and the BST.
+## Data Structures
+
+The implementation combines three structures:
+
+### Doubly Linked List
+Maintains access order, with the most recently used item at the head and the least recently used at the tail.
+- `insertList` — insert a new node at the head
+- `deleteLastList` — remove the last (least recently used) node
+- `print` — display the current cache contents
+
+### Binary Search Tree (Cache Index)
+Maps each application name to its node address in the linked list, enabling fast lookups.
+- `insertBST` — insert a node with name and linked-list address
+- `deleteBST` — delete a node by name
+- `searchBST` — search for a node by name
+- `heightBST` — compute the tree height
+- `pred` / `succ` — find predecessor / successor nodes for deletion
+
+### Usage Record BST
+Tracks per-application usage statistics.
+- `insertRecord` — add a new application record and initialize hits/misses
+- `searchRecord` — look up an application's record
+- `Record_print` — print the summary of hits and misses
+
+## Features
+
+- Fixed-size cache (default capacity: 5, set via the `cacheSize` macro)
+- O(log n) lookups through the BST index
+- Per-application hit/miss statistics
+- Interactive menu-driven simulation
+
+## Menu Options
+
+The program runs an interactive loop where you can:
+- Access an application (simulate a cache request)
+- Display the current cache blocks
+- View the usage summary (hits and misses)
+- Exit
+
+## Getting Started
+
+### Prerequisites
+
+- A C compiler (e.g., GCC)
+
+### Build and Run
+
+```bash
+git clone https://github.com/<your-username>/<repo-name>.git
+cd <repo-name>
+gcc lru.c -o lru
+./lru
+```
+
+> Adjust the cache capacity by editing the `#define cacheSize 5` macro in the source file.
+
+## Author
+
+**Markand Joshi** — Electronics & Communication Department, Nirma University
+
+## License
+
+This project is released under the MIT License. See the `LICENSE` file for details.
